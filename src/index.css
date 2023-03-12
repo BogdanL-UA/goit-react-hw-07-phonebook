@@ -17,6 +17,7 @@ code {
 body {
   font-family: sans-serif;
   line-height: 1.5;
+  background-color: darkgrey;
 }
 h1,
 h2,

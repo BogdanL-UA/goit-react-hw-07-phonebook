@@ -1,9 +1,13 @@
 .contacts{
-  margin-left: 80px;
+  margin: 80px;
 }
 .contactsList{
   display: flex;
     flex-direction: column;
+}
+.contactWrapper{
+  display: flex;
+  flex-direction: column;
 }
 .listItem{
   display: inline-flex;

@@ -1,68 +1,42 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { addContact, deleteContact } from 'redux/contacts/contacts-slice';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  fetchAddContact,
+  fetchAllContacts,
+} from 'redux/contacts/contacts-operations';
 import { setFilter } from 'redux/filter/filter-slice';
-import { getContacts } from 'redux/contacts/contacts-selectors';
-import { getFilter } from 'redux/filter/filter-selectors';
 
-import Contacts from './Contacts/Contacts';
+import Contacts from './ContactsList/ContactsList';
 import ContactForm from './ContactForm/ContactForm';
 import Filter from './Filter/Filter';
 
 import styles from '../components/App.module.css';
 
 const App = () => {
-  const contacts = useSelector(getContacts);
-  const filter = useSelector(getFilter);
+  const filter = useSelector(store => store.filter);
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(fetchAllContacts());
+  }, [dispatch]);
+
   const onAddContact = ({ name, number }) => {
-    if (isDublicate(name, number)) {
-      return alert(`${name}:${number} is already exist!`);
-    }
-    dispatch(addContact({ name, number }));
-  };
-
-  const isDublicate = (name, newNumber) => {
-    const nameNormalize = name.toLowerCase();
-    const contact = contacts.find(({ name, number }) => {
-      return nameNormalize === name.toLowerCase() && number === newNumber;
-    });
-    return Boolean(contact);
-  };
-
-  const removeContact = id => {
-    dispatch(deleteContact(id));
+    dispatch(fetchAddContact({ name, number }));
   };
 
   const onChangeFilter = e => {
-    const { value } = e.target;
+    const value = e.target.value.toLowerCase();
     dispatch(setFilter(value));
   };
-
-  const getFilteredContacts = () => {
-    if (!filter) {
-      return contacts;
-    }
-    const filterLowerCase = filter.toLowerCase();
-    const result = contacts.filter(({ name, number }) => {
-      return (
-        name.toLowerCase().includes(filterLowerCase) ||
-        number.includes(filterLowerCase)
-      );
-    });
-    return result;
-  };
-
-  const filteredContacts = getFilteredContacts();
 
   return (
     <div className={styles.app}>
       <h1 className={styles.title}>Phonebook</h1>
       <ContactForm onSubmit={onAddContact} />
       <h2 className={styles.title}>Contacts</h2>
-      <Filter onChange={onChangeFilter} />
-      <Contacts contacts={filteredContacts} removeContact={removeContact} />
+      <Filter value={filter} onChange={onChangeFilter} />
+      <Contacts />
     </div>
   );
 };
